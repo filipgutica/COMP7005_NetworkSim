@@ -15,8 +15,8 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QListView>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QTextBrowser>
 #include <QtWidgets/QToolBar>
@@ -27,10 +27,11 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
+    QAction *actionStart_Server;
     QWidget *centralWidget;
-    QGridLayout *gridLayout_2;
-    QTextBrowser *textBrowser;
-    QMenuBar *menuBar;
+    QGridLayout *gridLayout;
+    QListView *listView;
+    QTextBrowser *log;
     QToolBar *mainToolBar;
     QStatusBar *statusBar;
 
@@ -39,22 +40,25 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName(QStringLiteral("MainWindow"));
         MainWindow->resize(400, 300);
+        actionStart_Server = new QAction(MainWindow);
+        actionStart_Server->setObjectName(QStringLiteral("actionStart_Server"));
         centralWidget = new QWidget(MainWindow);
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
-        gridLayout_2 = new QGridLayout(centralWidget);
-        gridLayout_2->setSpacing(6);
-        gridLayout_2->setContentsMargins(11, 11, 11, 11);
-        gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
-        textBrowser = new QTextBrowser(centralWidget);
-        textBrowser->setObjectName(QStringLiteral("textBrowser"));
+        gridLayout = new QGridLayout(centralWidget);
+        gridLayout->setSpacing(6);
+        gridLayout->setContentsMargins(11, 11, 11, 11);
+        gridLayout->setObjectName(QStringLiteral("gridLayout"));
+        listView = new QListView(centralWidget);
+        listView->setObjectName(QStringLiteral("listView"));
 
-        gridLayout_2->addWidget(textBrowser, 0, 0, 1, 1);
+        gridLayout->addWidget(listView, 0, 0, 1, 1);
+
+        log = new QTextBrowser(centralWidget);
+        log->setObjectName(QStringLiteral("log"));
+
+        gridLayout->addWidget(log, 0, 1, 1, 1);
 
         MainWindow->setCentralWidget(centralWidget);
-        menuBar = new QMenuBar(MainWindow);
-        menuBar->setObjectName(QStringLiteral("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 400, 21));
-        MainWindow->setMenuBar(menuBar);
         mainToolBar = new QToolBar(MainWindow);
         mainToolBar->setObjectName(QStringLiteral("mainToolBar"));
         MainWindow->addToolBar(Qt::TopToolBarArea, mainToolBar);
@@ -70,6 +74,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        actionStart_Server->setText(QApplication::translate("MainWindow", "Start Server", 0));
     } // retranslateUi
 
 };
