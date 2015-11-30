@@ -91,7 +91,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     sendThrd->start();
 
-    //timer->start(500);
+    timer->start(500);
 
     /*
     char temp[DATA_SIZE];
@@ -183,7 +183,7 @@ void MainWindow::ProcessPacket(packet p)
         case DATA_PACKET:
             packet dgram;
             PrintPacketInfo(p);
-            BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
             WriteUDP(dgram);
             break;
         default:
