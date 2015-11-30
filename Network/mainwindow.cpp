@@ -8,12 +8,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    /*socket = new QUdpSocket(this);
+    socket = new QUdpSocket(this);
     socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
-    */
-    ListenThread *thrd = new ListenThread(this);
-    thrd->start();
+
+   //ListenThread *thrd = new ListenThread(this);
+    //thrd->start();
 
     tx_socket = new QUdpSocket(this);
 

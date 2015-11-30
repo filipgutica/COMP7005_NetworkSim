@@ -14,9 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    listenthread.cpp
+    listenthread.cpp \
+    sendthread.cpp
 
 HEADERS  += mainwindow.h \
-    listenthread.h
+    listenthread.h \
+    sendthread.h
 
 FORMS    += mainwindow.ui

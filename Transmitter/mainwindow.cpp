@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "listenthread.h"
+#include "sendthread.h"
 #include <Windows.h>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -79,6 +80,13 @@ void MainWindow::loadFiles()
 
 void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 {
+    SendThread *sendThrd = new SendThread(this);
+
+    sendThrd->setData(index.data().toString());
+
+    sendThrd->start();
+
+    /*
     char temp[DATA_SIZE];
     int i =0;
     int seqNum = 0;
@@ -119,7 +127,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
             memset(temp, 0, sizeof(temp));
         }
     }
-
+    */
 }
 
 void MainWindow::readtxDatagrams()
@@ -151,6 +159,26 @@ void MainWindow::WriteUDP(packet p)
 
 
 void MainWindow::ProcessPacket(packet p)
+{
+    PrintPacketInfo(p);
+
+    switch (p.PacketType)
+    {
+        case CONTROL_PACKET:
+
+            break;
+        case DATA_PACKET:
+            packet dgram;
+
+            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            WriteUDP(dgram);
+            break;
+        default:
+            break;
+    }
+}
+
+void MainWindow::processPacketFromThread(MainWindow::packet p)
 {
     PrintPacketInfo(p);
 

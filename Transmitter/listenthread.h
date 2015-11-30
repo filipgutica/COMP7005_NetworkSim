@@ -16,6 +16,7 @@ private:
     MainWindow *window;
 
 signals:
+    void packetReady(MainWindow::packet);
 
 private slots:
     void readrxDatagrams();

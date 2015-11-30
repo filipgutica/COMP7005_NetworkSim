@@ -17,6 +17,8 @@
 #include <QtNetwork>
 #include <QTimer>
 
+
+
 namespace Ui {
 class MainWindow;
 }
@@ -41,6 +43,8 @@ public:
         int dest_port;
     };
 
+    QVector<packet> *currentPacketWindow;
+
     explicit MainWindow(QWidget *parent = 0);
     void loadFiles();
     void updateFileList();
@@ -59,6 +63,7 @@ private slots:
     void readrxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
     void timeoutEvent();
+    void processPacketFromThread(MainWindow::packet);
 
 private:
     Ui::MainWindow *ui;
@@ -67,7 +72,6 @@ private:
     QStringList _fileList;
     QTimer *timer;
     int previous_ack;
-    QVector<packet> *currentPacketWindow;
     bool allPacketsAckd;
 };
 
