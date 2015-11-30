@@ -172,15 +172,19 @@ void MainWindow::ProcessPacket(packet p)
     switch (p.PacketType)
     {
         case CONTROL_PACKET:
-            sem1.acquire();
-            PrintPacketInfo(p);
-            sem2.release();
+            if(sentPacket.SeqNum == p.AckNum)
+            {
+                qDebug() << "GOOD!";
+                sem1.acquire();
+                PrintPacketInfo(p);
+                sem2.release();
+            }
 
             break;
         case DATA_PACKET:
             packet dgram;
 
-            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
             WriteUDP(dgram);
             break;
         default:

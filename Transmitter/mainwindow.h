@@ -45,6 +45,7 @@ public:
 
     QVector<packet> *currentPacketWindow;
     bool allPacketsAckd;
+    packet sentPacket;
 
     explicit MainWindow(QWidget *parent = 0);
     void loadFiles();
