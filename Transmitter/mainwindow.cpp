@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QMessageBox>
+#include "listenthread.h"
 #include <Windows.h>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -16,9 +16,20 @@ MainWindow::MainWindow(QWidget *parent) :
     tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
     connect(tx_socket, SIGNAL(readyRead()), this, SLOT(readtxDatagrams()));
 
+
+#ifndef THREADED
+    qDebug() << "Not Threaded";
     rx_socket = new QUdpSocket(this);
     rx_socket->bind(QHostAddress::AnyIPv4, RECEIVER_PORT);
     connect(rx_socket, SIGNAL(readyRead()), this, SLOT(readrxDatagrams()));
+
+#endif
+
+#ifdef THREADED
+    qDebug() << "Threaded";
+    ListenThread *thrd = new ListenThread(this);
+    thrd->start();
+#endif
 
     connect(this, SIGNAL(valueChanged(QString)), ui->log, SLOT(append(QString)));
 }
@@ -80,6 +91,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
         BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
         // Write the datagram
+        Sleep(1);
         WriteUDP(dgram);
 
         i += DATA_SIZE;

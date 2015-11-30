@@ -9,6 +9,8 @@
 #define DATA_SIZE 256
 #define WINDOW_SIZE 10
 
+//#define THREADED
+
 
 #include <QMainWindow>
 #include <QtNetwork>
@@ -24,6 +26,9 @@ class MainWindow : public QMainWindow
     const char *NETWORK_ADDR = "192.168.1.72";
     const char *TRANSMIT_ADDR = "192.168.1.69";
 
+
+
+public:
     struct packet
     {
         int PacketType;
@@ -35,7 +40,6 @@ class MainWindow : public QMainWindow
         int dest_port;
     };
 
-public:
     explicit MainWindow(QWidget *parent = 0);
     void loadFiles();
     void updateFileList();
