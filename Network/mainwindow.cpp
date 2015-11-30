@@ -1,6 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "listenthread.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,12 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
 
-   //ListenThread *thrd = new ListenThread(this);
-    //thrd->start();
-
     tx_socket = new QUdpSocket(this);
-
-
     connect(this, SIGNAL(valueChanged(QString)), ui->textBrowser, SLOT(append(QString)));
 }
 
