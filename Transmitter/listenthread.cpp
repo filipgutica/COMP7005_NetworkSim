@@ -13,8 +13,8 @@ void ListenThread::readrxDatagrams()
     while (rx_socket->hasPendingDatagrams())
     {
         rx_socket->readDatagram((char*)&packet, sizeof(packet));
-        //window->ProcessPacket(packet);
-        emit packetReady(packet);
+        window->ProcessPacket(packet);
+       // emit packetReady(packet);
     }
 }
 
