@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
         int WindowSize;
         int AckNum;
         char dest_addr[32];
+        int dest_port;
     };
 
 public:
@@ -37,6 +38,7 @@ public:
     QUdpSocket *socket;
     void ProcessPacket(packet);
     void PrintPacketInfo(packet);
+    void WriteUDP(packet p);
 
 signals:
     void valueChanged(QString);

@@ -20,7 +20,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    const char *RECV_ADDR = "localhost";
+    const char *RECV_ADDR = "127.0.0.1";
+    const char *NETWORK_ADDR = "127.0.0.1";
 
     struct packet
     {
@@ -30,6 +31,7 @@ class MainWindow : public QMainWindow
         int WindowSize;
         int AckNum;
         char dest_addr[32];
+        int dest_port;
     };
 
 public:
@@ -39,19 +41,22 @@ public:
     void AppendToLog(QString);
     void WriteUDP(packet);
     void ProcessPacket(packet);
-    void BuildPacket(packet &p, int ack, int seq, int win, int type, char* data, char* destAddr);
+    void BuildPacket(packet &p, int ack, int seq, int win, int type, int destPort, char* data, char* destAddr);
+    void PrintPacketInfo(packet p);
     ~MainWindow();
 
 signals:
     void valueChanged(QString);
 
 private slots:
-    void readDatagrams();
+    void readtxDatagrams();
+    void readrxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::MainWindow *ui;
-    QUdpSocket *socket;
+    QUdpSocket *tx_socket;
+    QUdpSocket *rx_socket;
     QStringList _fileList;
 
 };

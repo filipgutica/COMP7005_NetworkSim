@@ -36,6 +36,7 @@ void MainWindow::readDatagrams()
 void MainWindow::ProcessPacket(packet p)
 {
     PrintPacketInfo(p);
+    WriteUDP(p);
 }
 
 void MainWindow::PrintPacketInfo(packet p)
@@ -59,13 +60,21 @@ void MainWindow::PrintPacketInfo(packet p)
                                  "Sequence: %2\n"
                                  "WindowSize: %3\n"
                                  "AckNum: %4\n"
-                                 "Destination: %5\n")
+                                 "Destination addr: %5\n"
+                                 "Destination port: %6\n")
             .arg(pType,
                  QString::number(p.SeqNum),
                  QString::number(p.WindowSize),
                  QString::number(p.AckNum),
-                 p.dest_addr);
+                 p.dest_addr,
+                 QString::number(p.dest_port));
 
     AppendToLog(packetInfo);
    // AppendToLog(p.data);
+}
+
+
+void MainWindow::WriteUDP(packet p)
+{
+    socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(p.dest_addr), p.dest_port);
 }
