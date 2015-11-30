@@ -167,7 +167,6 @@ void MainWindow::WriteUDP(packet p)
 
 void MainWindow::ProcessPacket(packet p)
 {
-    //PrintPacketInfo(p);
 
     switch (p.PacketType)
     {
@@ -183,7 +182,7 @@ void MainWindow::ProcessPacket(packet p)
             break;
         case DATA_PACKET:
             packet dgram;
-
+            PrintPacketInfo(p);
             BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
             WriteUDP(dgram);
             break;
