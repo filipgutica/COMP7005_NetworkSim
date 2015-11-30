@@ -10,7 +10,7 @@
 #define WINDOW_SIZE 10
 #define MAX_RETRANSMISSIONS 4
 
-#define THREADED
+//#define THREADED
 
 
 #include <QMainWindow>
