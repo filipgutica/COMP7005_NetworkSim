@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     tx_socket = new QUdpSocket(this);
     connect(this, SIGNAL(valueChanged(QString)), ui->textBrowser, SLOT(append(QString)));
+
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
 }
 
 MainWindow::~MainWindow()
@@ -29,22 +32,23 @@ void MainWindow::AppendToLog(QString s)
 void MainWindow::readDatagrams()
 {
     packet p;
-    QTime time = QTime::currentTime();
-    qsrand((uint)time.msec());
 
-    while (socket->hasPendingDatagrams())
+    int randomValue = qrand() % ((100 + 1) - 0) + 0;
+
+
+    if (socket->hasPendingDatagrams())
     {
-        int randomValue = qrand() % ((100 + 1) - 0) + 0;
 
-        if (randomValue > 10)
+        if (randomValue > 20)
         {
-
             socket->readDatagram((char*)&p, sizeof(p));
             ProcessPacket(p);
         }
         else
         {
-            qDebug() << "Dropped a packet!";
+            socket->readDatagram((char*)&p, sizeof(p));
+            AppendToLog("Dropped a packet!\n");
+
         }
     }
 }
