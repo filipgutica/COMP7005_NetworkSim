@@ -8,12 +8,15 @@
 #define DATA_PACKET 002
 #define DATA_SIZE 256
 #define WINDOW_SIZE 10
+#define MAX_RETRANSMISSIONS 4
 
 //#define THREADED
 
 
 #include <QMainWindow>
 #include <QtNetwork>
+#include <QTimer>
+
 namespace Ui {
 class MainWindow;
 }
@@ -22,11 +25,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    const char *RECV_ADDR = "192.168.1.69";
+    const char *RECV_ADDR = "127.0.0.1";
     const char *NETWORK_ADDR = "192.168.1.72";
     const char *TRANSMIT_ADDR = "192.168.1.69";
-
-
 
 public:
     struct packet
@@ -57,13 +58,14 @@ private slots:
     void readtxDatagrams();
     void readrxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
+    void timeoutEvent();
 
 private:
     Ui::MainWindow *ui;
     QUdpSocket *tx_socket;
     QUdpSocket *rx_socket;
     QStringList _fileList;
-
+    QTimer *timer;
 };
 
 #endif // MAINWINDOW_H

@@ -16,6 +16,10 @@ MainWindow::MainWindow(QWidget *parent) :
     tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
     connect(tx_socket, SIGNAL(readyRead()), this, SLOT(readtxDatagrams()));
 
+    // Timer for ack timeouts
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()),this, SLOT(timeoutEvent()));
+
 
 #ifndef THREADED
     qDebug() << "Not Threaded";
@@ -85,13 +89,14 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
         return;
     }
 
+    timer->start(500);
+
     while ((file.read(temp, DATA_SIZE)))
     {
         float window = file.size()/DATA_SIZE;
         BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
         // Write the datagram
-        Sleep(1);
         WriteUDP(dgram);
 
         i += DATA_SIZE;
@@ -142,7 +147,7 @@ void MainWindow::ProcessPacket(packet p)
         case DATA_PACKET:
             packet dgram;
 
-            BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
             WriteUDP(dgram);
             break;
         default:
@@ -194,4 +199,9 @@ void MainWindow::ProcessPacket(packet p)
 
      AppendToLog(packetInfo);
     // AppendToLog(p.data);
+ }
+
+ void MainWindow::timeoutEvent()
+ {
+    AppendToLog(QString("Timeout!!!"));
  }
