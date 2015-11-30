@@ -14,7 +14,6 @@ void ListenThread::readrxDatagrams()
     {
         rx_socket->readDatagram((char*)&packet, sizeof(packet));
         window->ProcessPacket(packet);
-       // emit packetReady(packet);
     }
 }
 
@@ -24,7 +23,7 @@ void ListenThread::run()
     rx_socket->bind(QHostAddress::AnyIPv4, RECEIVER_PORT);
     connect(rx_socket, SIGNAL(readyRead()), this, SLOT(readrxDatagrams()), Qt::DirectConnection);
 
-    connect(this, SIGNAL(packetReady(MainWindow::packet)), window, SLOT(processPacketFromThread(MainWindow::packet)));
+
 
     exec();
 }
