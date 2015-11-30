@@ -20,8 +20,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    const char *RECV_ADDR = "127.0.0.1";
-    const char *NETWORK_ADDR = "127.0.0.1";
+    const char *RECV_ADDR = "192.168.1.69";
+    const char *NETWORK_ADDR = "192.168.1.72";
+    const char *TRANSMIT_ADDR = "192.168.1.69";
 
     struct packet
     {

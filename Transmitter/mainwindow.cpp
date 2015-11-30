@@ -64,7 +64,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
     char temp[DATA_SIZE];
     int i =0;
     int seqNum = 0;
-    packet *dgram = new packet();
+    packet dgram;
     QFile file(index.data().toString());
 
     //open the file for reading
@@ -76,10 +76,11 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     while ((file.read(temp, DATA_SIZE)))
     {
-        BuildPacket(*dgram, 0, seqNum, file.size(), DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
+        float window = file.size()/DATA_SIZE;
+        BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
         // Write the datagram
-        WriteUDP(*dgram);
+        WriteUDP(dgram);
 
         i += DATA_SIZE;
         seqNum++;
@@ -127,7 +128,10 @@ void MainWindow::ProcessPacket(packet p)
 
             break;
         case DATA_PACKET:
+            packet dgram;
 
+            BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            WriteUDP(dgram);
             break;
         default:
             break;
