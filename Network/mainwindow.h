@@ -36,6 +36,7 @@ public:
     ~MainWindow();
     void AppendToLog(QString);
     QUdpSocket *socket;
+    QUdpSocket *tx_socket;
     void ProcessPacket(packet);
     void PrintPacketInfo(packet);
     void WriteUDP(packet p);

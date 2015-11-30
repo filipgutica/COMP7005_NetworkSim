@@ -8,6 +8,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     socket = new QUdpSocket(this);
     socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
+
+    tx_socket = new QUdpSocket(this);
+
     connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
     connect(this, SIGNAL(valueChanged(QString)), ui->textBrowser, SLOT(append(QString)));
 }
@@ -78,5 +81,5 @@ void MainWindow::WriteUDP(packet p)
 {
     // Redirect packet to the destination address and port in the received packet structure
     qDebug() << "Writing";
-    socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(p.dest_addr), p.dest_port);
+    tx_socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(p.dest_addr), p.dest_port);
 }
