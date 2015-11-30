@@ -86,6 +86,5 @@ void MainWindow::PrintPacketInfo(packet p)
 void MainWindow::WriteUDP(packet p)
 {
     // Redirect packet to the destination address and port in the received packet structure
-    qDebug() << "Writing";
     tx_socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(p.dest_addr), p.dest_port);
 }
