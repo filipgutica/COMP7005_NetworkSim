@@ -19,7 +19,7 @@ void ListenThread::readrxDatagrams()
 void ListenThread::run()
 {
     rx_socket = new QUdpSocket();
-    rx_socket->bind(QHostAddress::AnyIPv4, RECEIVER_PORT);
+    rx_socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
     connect(rx_socket, SIGNAL(readyRead()), this, SLOT(readrxDatagrams()), Qt::DirectConnection);
 
     exec();
