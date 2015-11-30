@@ -120,9 +120,9 @@ void MainWindow::ProcessPacket(packet p)
         case CONTROL_PACKET:
             if(sentPacket.SeqNum == p.AckNum)
             {
-                qDebug() << p.SeqNum;
-                //sem1.acquire();
+                sem1.acquire();
                 PrintPacketInfo(p);
+
                 timer->start();
                 reTransmitCount = 0;
                 sem2.release();

@@ -41,7 +41,7 @@ void SendThread::run()
         // Write the datagrams
         sem2.acquire();
         window->WriteUDP(dgram);
-       // sem1.release();
+        sem1.release();
 
         i += DATA_SIZE;
         seqNum++;

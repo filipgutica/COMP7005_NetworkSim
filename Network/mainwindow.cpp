@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QTime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,8 +32,21 @@ void MainWindow::readDatagrams()
 
     while (socket->hasPendingDatagrams())
     {
-        socket->readDatagram((char*)&p, sizeof(p));
-        ProcessPacket(p);
+        QTime time = QTime::currentTime();
+        qsrand((uint)time.msec());
+
+        int randomValue = qrand() % ((100 + 1) - 0) + 0;
+
+        if (randomValue > 10)
+        {
+
+            socket->readDatagram((char*)&p, sizeof(p));
+            ProcessPacket(p);
+        }
+        else
+        {
+            qDebug() << "Dropped a packet!";
+        }
     }
 }
 
