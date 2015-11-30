@@ -178,26 +178,6 @@ void MainWindow::ProcessPacket(packet p)
     }
 }
 
-void MainWindow::processPacketFromThread(MainWindow::packet p)
-{
-    PrintPacketInfo(p);
-
-    switch (p.PacketType)
-    {
-        case CONTROL_PACKET:
-
-            break;
-        case DATA_PACKET:
-            packet dgram;
-
-            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
-            WriteUDP(dgram);
-            break;
-        default:
-            break;
-    }
-}
-
  void MainWindow::BuildPacket(packet &p, int ack, int seq, int win, int type, int destPort, char* data, char* destAddr)
  {
      p.AckNum = ack;

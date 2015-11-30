@@ -63,7 +63,6 @@ private slots:
     void readrxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
     void timeoutEvent();
-    void processPacketFromThread(MainWindow::packet);
 
 private:
     Ui::MainWindow *ui;
