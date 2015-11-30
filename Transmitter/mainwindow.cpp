@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFiles();
     updateFileList();
 
+    reTransmitCount = 0;
     allPacketsAckd = true;
     currentPacketWindow = new QVector<packet>();
     receivedControlPackets = new QVector<packet>();
@@ -91,50 +92,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     sendThrd->start();
 
-    timer->start(500);
-
-    /*
-    char temp[DATA_SIZE];
-    int i =0;
-    int seqNum = 0;
-    packet dgram;
-    QFile file(index.data().toString());
-
-    //open the file for reading
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        qDebug() << "cannot find file";
-        return;
-    }
-
-    timer->start(500);
-
-    while ((file.read(temp, DATA_SIZE)))
-    {
-        if (allPacketsAckd)
-        {
-            float window = file.size()/DATA_SIZE;
-            BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
-
-            if(currentPacketWindow->size() <= WINDOW_SIZE)
-                currentPacketWindow->push_back(dgram);
-
-            // Write the datagram
-            Sleep(500);
-            for (int j = 0; j < currentPacketWindow->size(); j++)
-            {
-                WriteUDP(currentPacketWindow->at(j));
-            }
-
-            currentPacketWindow->clear();
-
-            i += DATA_SIZE;
-            seqNum++;
-            file.seek(i);
-            memset(temp, 0, sizeof(temp));
-        }
-    }
-    */
+    timer->start(200);
 }
 
 void MainWindow::readtxDatagrams()
@@ -144,17 +102,6 @@ void MainWindow::readtxDatagrams()
     while (tx_socket->hasPendingDatagrams())
     {
         tx_socket->readDatagram((char*)&packet, sizeof(packet));
-        ProcessPacket(packet);
-    }
-}
-
-void MainWindow::readrxDatagrams()
-{
-    packet packet;
-
-    while (rx_socket->hasPendingDatagrams())
-    {
-        rx_socket->readDatagram((char*)&packet, sizeof(packet));
         ProcessPacket(packet);
     }
 }
@@ -173,9 +120,11 @@ void MainWindow::ProcessPacket(packet p)
         case CONTROL_PACKET:
             if(sentPacket.SeqNum == p.AckNum)
             {
-                qDebug() << "GOOD!";
-                sem1.acquire();
+                qDebug() << p.SeqNum;
+                //sem1.acquire();
                 PrintPacketInfo(p);
+                timer->start();
+                reTransmitCount = 0;
                 sem2.release();
             }
 
@@ -239,6 +188,12 @@ void MainWindow::ProcessPacket(packet p)
 
  void MainWindow::timeoutEvent()
  {
-    AppendToLog(QString("Timeout!!!"));
+    if (reTransmitCount <= MAX_RETRANSMISSIONS)
+    {
+        AppendToLog(QString("Retransmitting!!!"));
+        reTransmitCount ++;
+        WriteUDP(sentPacket);
+        sem2.release();
+    }
  }
 

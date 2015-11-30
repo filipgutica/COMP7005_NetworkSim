@@ -24,7 +24,5 @@ void ListenThread::run()
     rx_socket->bind(QHostAddress::AnyIPv4, RECEIVER_PORT);
     connect(rx_socket, SIGNAL(readyRead()), this, SLOT(readrxDatagrams()), Qt::DirectConnection);
 
-
-
     exec();
 }

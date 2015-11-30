@@ -7,7 +7,6 @@
 #define CONTROL_PACKET 001
 #define DATA_PACKET 002
 #define DATA_SIZE 256
-#define WINDOW_SIZE 10
 #define MAX_RETRANSMISSIONS 4
 
 #define THREADED
@@ -62,7 +61,6 @@ signals:
 
 private slots:
     void readtxDatagrams();
-    void readrxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
     void timeoutEvent();
 
@@ -74,6 +72,7 @@ private:
     QTimer *timer;
     int previous_ack;
     QVector<packet> *receivedControlPackets;
+    int reTransmitCount;
 };
 
 #endif // MAINWINDOW_H

@@ -36,13 +36,12 @@ void SendThread::run()
 
         float windowSize = file.size()/DATA_SIZE;
         window->BuildPacket(dgram, 0, seqNum, (int)windowSize, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
-
         window->sentPacket = dgram;
 
         // Write the datagrams
         sem2.acquire();
         window->WriteUDP(dgram);
-        sem1.release();
+       // sem1.release();
 
         i += DATA_SIZE;
         seqNum++;
