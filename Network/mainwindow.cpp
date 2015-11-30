@@ -29,12 +29,11 @@ void MainWindow::AppendToLog(QString s)
 void MainWindow::readDatagrams()
 {
     packet p;
+    QTime time = QTime::currentTime();
+    qsrand((uint)time.msec());
 
     while (socket->hasPendingDatagrams())
     {
-        QTime time = QTime::currentTime();
-        qsrand((uint)time.msec());
-
         int randomValue = qrand() % ((100 + 1) - 0) + 0;
 
         if (randomValue > 10)
