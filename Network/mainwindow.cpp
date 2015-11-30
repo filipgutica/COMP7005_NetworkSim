@@ -1,17 +1,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "listenthread.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    socket = new QUdpSocket(this);
+
+    /*socket = new QUdpSocket(this);
     socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
+    */
+    ListenThread *thrd = new ListenThread(this);
+    thrd->start();
 
     tx_socket = new QUdpSocket(this);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
+
     connect(this, SIGNAL(valueChanged(QString)), ui->textBrowser, SLOT(append(QString)));
 }
 

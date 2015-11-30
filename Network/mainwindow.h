@@ -20,6 +20,9 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+
+
+public:
     struct packet
     {
         int PacketType;
@@ -31,7 +34,6 @@ class MainWindow : public QMainWindow
         int dest_port;
     };
 
-public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void AppendToLog(QString);
