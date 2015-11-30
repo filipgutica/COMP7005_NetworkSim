@@ -10,7 +10,7 @@
 #define WINDOW_SIZE 10
 #define MAX_RETRANSMISSIONS 4
 
-//#define THREADED
+#define THREADED
 
 
 #include <QMainWindow>
@@ -66,6 +66,9 @@ private:
     QUdpSocket *rx_socket;
     QStringList _fileList;
     QTimer *timer;
+    int previous_ack;
+    QVector<packet> *currentPacketWindow;
+    bool allPacketsAckd;
 };
 
 #endif // MAINWINDOW_H

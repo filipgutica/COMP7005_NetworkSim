@@ -12,6 +12,9 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFiles();
     updateFileList();
 
+    allPacketsAckd = true;
+    currentPacketWindow = new QVector<packet>();
+
     tx_socket = new QUdpSocket(this);
     tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
     connect(tx_socket, SIGNAL(readyRead()), this, SLOT(readtxDatagrams()));
@@ -93,16 +96,28 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     while ((file.read(temp, DATA_SIZE)))
     {
-        float window = file.size()/DATA_SIZE;
-        BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
+        if (allPacketsAckd)
+        {
+            float window = file.size()/DATA_SIZE;
+            BuildPacket(dgram, 0, seqNum, (int)window, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
-        // Write the datagram
-        WriteUDP(dgram);
+            if(currentPacketWindow->size() <= WINDOW_SIZE)
+                currentPacketWindow->push_back(dgram);
 
-        i += DATA_SIZE;
-        seqNum++;
-        file.seek(i);
-        memset(temp, 0, sizeof(temp));
+            // Write the datagram
+            Sleep(500);
+            for (int j = 0; j < currentPacketWindow->size(); j++)
+            {
+                WriteUDP(currentPacketWindow->at(j));
+            }
+
+            currentPacketWindow->clear();
+
+            i += DATA_SIZE;
+            seqNum++;
+            file.seek(i);
+            memset(temp, 0, sizeof(temp));
+        }
     }
 
 }
