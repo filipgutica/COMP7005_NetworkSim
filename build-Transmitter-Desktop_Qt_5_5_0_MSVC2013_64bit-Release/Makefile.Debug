@@ -13,7 +13,7 @@ CC            = cl
 CXX           = cl
 DEFINES       = -DUNICODE -DWIN32 -DWIN64 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -nologo -Zc:wchar_t -FS -Zi -MDd -W3 /Fddebug\Transmitter.pdb $(DEFINES)
-CXXFLAGS      = -nologo -Zc:wchar_t -FS /FS -Zi -MDd -GR -W3 -w34100 -w34189 -w44996 -EHsc /Fddebug\Transmitter.pdb $(DEFINES)
+CXXFLAGS      = -nologo -Zc:wchar_t -FS -Zi -MDd -GR -W3 -w34100 -w34189 -w44996 -EHsc /Fddebug\Transmitter.pdb $(DEFINES)
 INCPATH       = -I..\Transmitter -I. -IC:\Qt\5.5\msvc2013_64\include -IC:\Qt\5.5\msvc2013_64\include\QtWidgets -IC:\Qt\5.5\msvc2013_64\include\QtGui -IC:\Qt\5.5\msvc2013_64\include\QtANGLE -IC:\Qt\5.5\msvc2013_64\include\QtNetwork -IC:\Qt\5.5\msvc2013_64\include\QtCore -Idebug -I. -IC:\Qt\5.5\msvc2013_64\mkspecs\win32-msvc2013 
 LINKER        = link
 LFLAGS        = /NOLOGO /DYNAMICBASE /NXCOMPAT /DEBUG /SUBSYSTEM:WINDOWS "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'"
@@ -59,7 +59,8 @@ OBJECTS       = debug\main.obj \
 
 DIST          =  ..\Transmitter\mainwindow.h \
 		..\Transmitter\listenthread.h \
-		..\Transmitter\sendthread.h ..\Transmitter\main.cpp \
+		..\Transmitter\sendthread.h \
+		..\Transmitter\globals.h ..\Transmitter\main.cpp \
 		..\Transmitter\mainwindow.cpp \
 		..\Transmitter\listenthread.cpp \
 		..\Transmitter\sendthread.cpp
@@ -143,7 +144,7 @@ $(OBJECTS) $(LIBS)
 <<
 
 qmake: FORCE
-	@$(QMAKE) -spec win32-msvc2013 "CONFIG+=debug" -o Makefile.Debug ..\Transmitter\Transmitter.pro
+	@$(QMAKE) -spec win32-msvc2013 -o Makefile.Debug ..\Transmitter\Transmitter.pro
 
 qmake_all: FORCE
 
@@ -1590,7 +1591,9 @@ debug\mainwindow.obj: ..\Transmitter\mainwindow.cpp ../Transmitter/mainwindow.h 
 		C:\Qt\5.5\msvc2013_64\include\QtWidgets\QWidget \
 		../Transmitter/listenthread.h \
 		C:\Qt\5.5\msvc2013_64\include\QtCore\QThread \
-		../Transmitter/sendthread.h
+		../Transmitter/sendthread.h \
+		../Transmitter/globals.h \
+		C:\Qt\5.5\msvc2013_64\include\QtCore\QMutex
 
 debug\listenthread.obj: ..\Transmitter\listenthread.cpp ../Transmitter/listenthread.h \
 		C:\Qt\5.5\msvc2013_64\include\QtCore\QThread \
@@ -2130,7 +2133,9 @@ debug\sendthread.obj: ..\Transmitter\sendthread.cpp ../Transmitter/sendthread.h 
 		C:\Qt\5.5\msvc2013_64\include\QtCore\QHash \
 		C:\Qt\5.5\msvc2013_64\include\QtNetwork\qsslkey.h \
 		C:\Qt\5.5\msvc2013_64\include\QtNetwork\qtnetworkversion.h \
-		C:\Qt\5.5\msvc2013_64\include\QtCore\QTimer
+		C:\Qt\5.5\msvc2013_64\include\QtCore\QTimer \
+		../Transmitter/globals.h \
+		C:\Qt\5.5\msvc2013_64\include\QtCore\QMutex
 
 debug\moc_mainwindow.obj: debug\moc_mainwindow.cpp 
 

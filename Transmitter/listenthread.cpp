@@ -1,4 +1,5 @@
 #include "listenthread.h"
+#include "globals.h"
 
 ListenThread::ListenThread(QObject *parent)
 {

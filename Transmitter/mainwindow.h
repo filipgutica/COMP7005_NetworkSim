@@ -44,6 +44,7 @@ public:
     };
 
     QVector<packet> *currentPacketWindow;
+    bool allPacketsAckd;
 
     explicit MainWindow(QWidget *parent = 0);
     void loadFiles();
@@ -71,7 +72,7 @@ private:
     QStringList _fileList;
     QTimer *timer;
     int previous_ack;
-    bool allPacketsAckd;
+    QVector<packet> *receivedControlPackets;
 };
 
 #endif // MAINWINDOW_H

@@ -1,5 +1,9 @@
 #include "sendthread.h"
+#include "globals.h"
 #include <Windows.h>
+
+
+QSemaphore sem2(1);
 
 SendThread::SendThread(QObject *parent)
 {
@@ -29,31 +33,26 @@ void SendThread::run()
 
     while ((file.read(temp, DATA_SIZE)))
     {
-        if (true)
-        {
-            float windowSize = file.size()/DATA_SIZE;
-            window->BuildPacket(dgram, 0, seqNum, (int)windowSize, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
-            if(window->currentPacketWindow->size() <= WINDOW_SIZE
-                    && (file.size() - i) >= DATA_SIZE)
-            {
-                window->currentPacketWindow->push_back(dgram);
-            }
-            else
-            {
-                // Write the datagrams
-                for (int j = 0; j < window->currentPacketWindow->size(); j++)
-                {
-                    window->WriteUDP(window->currentPacketWindow->at(j));
-                }
+        float windowSize = file.size()/DATA_SIZE;
+        window->BuildPacket(dgram, 0, seqNum, (int)windowSize, DATA_PACKET, RECEIVER_PORT, temp, (char*)RECV_ADDR);
 
-                window->currentPacketWindow->clear();
-            }
 
-            i += DATA_SIZE;
-            seqNum++;
-            file.seek(i);
-            memset(temp, 0, sizeof(temp));
-        }
+
+        // Write the datagrams
+
+        sem2.acquire();
+        window->WriteUDP(dgram);
+
+
+        sem1.release();
+
+
+        i += DATA_SIZE;
+        seqNum++;
+        file.seek(i);
+        memset(temp, 0, sizeof(temp));
+
+
     }
 }

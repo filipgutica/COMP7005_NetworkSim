@@ -2,7 +2,11 @@
 #include "ui_mainwindow.h"
 #include "listenthread.h"
 #include "sendthread.h"
+#include "globals.h"
 #include <Windows.h>
+
+QMutex mutex;
+QSemaphore sem1;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     allPacketsAckd = true;
     currentPacketWindow = new QVector<packet>();
+    receivedControlPackets = new QVector<packet>();
 
     tx_socket = new QUdpSocket(this);
     tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
@@ -85,6 +90,8 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
     sendThrd->setData(index.data().toString());
 
     sendThrd->start();
+
+    //timer->start(500);
 
     /*
     char temp[DATA_SIZE];
@@ -160,11 +167,14 @@ void MainWindow::WriteUDP(packet p)
 
 void MainWindow::ProcessPacket(packet p)
 {
-    PrintPacketInfo(p);
+    //PrintPacketInfo(p);
 
     switch (p.PacketType)
     {
         case CONTROL_PACKET:
+            sem1.acquire();
+            PrintPacketInfo(p);
+            sem2.release();
 
             break;
         case DATA_PACKET:
@@ -228,3 +238,4 @@ void MainWindow::ProcessPacket(packet p)
  {
     AppendToLog(QString("Timeout!!!"));
  }
+

@@ -19,6 +19,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     listenthread.h \
-    sendthread.h
+    sendthread.h \
+    globals.h
 
 FORMS    += mainwindow.ui
+
