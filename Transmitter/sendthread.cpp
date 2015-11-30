@@ -41,6 +41,10 @@ void SendThread::run()
         // Write the datagrams
         sem2.acquire();
         window->WriteUDP(dgram);
+
+        if ((file.size() - i) <= DATA_SIZE)
+            window->lastPacket = true;
+
         sem1.release();
 
         i += DATA_SIZE;

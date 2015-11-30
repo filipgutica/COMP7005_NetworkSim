@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     allPacketsAckd = true;
     currentPacketWindow = new QVector<packet>();
     receivedControlPackets = new QVector<packet>();
+    lastPacket = false;
 
     tx_socket = new QUdpSocket(this);
     tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
@@ -88,11 +89,14 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 {
     SendThread *sendThrd = new SendThread(this);
 
+    lastPacket = false;
+
     sendThrd->setData(index.data().toString());
 
     sendThrd->start();
 
     timer->start(200);
+
 }
 
 void MainWindow::readtxDatagrams()
@@ -188,7 +192,7 @@ void MainWindow::ProcessPacket(packet p)
 
  void MainWindow::timeoutEvent()
  {
-    if (reTransmitCount <= MAX_RETRANSMISSIONS)
+    if (reTransmitCount < MAX_RETRANSMISSIONS && !lastPacket)
     {
         AppendToLog(QString("Retransmitting!!!"));
         reTransmitCount ++;
