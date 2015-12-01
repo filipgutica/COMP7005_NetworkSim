@@ -44,7 +44,7 @@ void SendThread::run()
 
       //  window->WriteUDP(dgram);
 
-        if (window->currentPacketWindow->size() == WINDOW_SIZE)
+        if (window->currentPacketWindow->size() >= WINDOW_SIZE)
         {
             for (int i = 0; i < window->currentPacketWindow->size(); i++)
             {

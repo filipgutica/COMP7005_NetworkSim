@@ -11,7 +11,7 @@ void ListenThread::readrxDatagrams()
 {
     MainWindow::packet packet;
 
-    if (rx_socket->hasPendingDatagrams())
+    while (rx_socket->hasPendingDatagrams())
     {
         rx_socket->readDatagram((char*)&packet, sizeof(packet));
         window->ProcessPacket(packet);

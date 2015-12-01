@@ -10,7 +10,7 @@
 #define DATA_SIZE 256
 #define MAX_RETRANSMISSIONS 4
 #define WINDOW_SIZE 10
-#define TIMEOUT 500
+#define TIMEOUT 1000
 
 
 #include <QMainWindow>

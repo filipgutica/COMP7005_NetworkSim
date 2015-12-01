@@ -93,7 +93,7 @@ void MainWindow::readtxDatagrams()
 {
     packet packet;
 
-    if (tx_socket->hasPendingDatagrams())
+    while (tx_socket->hasPendingDatagrams())
     {
         tx_socket->readDatagram((char*)&packet, sizeof(packet));
         ProcessPacket(packet);
@@ -112,9 +112,10 @@ void MainWindow::ProcessPacket(packet p)
     {
         case CONTROL_PACKET:
 
-            receivedControlPackets->push_back(p);
 
-            if (receivedControlPackets->size() == WINDOW_SIZE || lastPacket)
+            receivedControlPackets->push_back(p);
+            qDebug() << receivedControlPackets->size();
+            if (receivedControlPackets->size() >= WINDOW_SIZE || lastPacket)
             {
                 timer->start(TIMEOUT);
                // qDebug() << "Received all acks";
@@ -122,10 +123,13 @@ void MainWindow::ProcessPacket(packet p)
                 {
                     PrintPacketInfo(receivedControlPackets->at(i));
                 }
+
                 receivedControlPackets->clear();
                 currentPacketWindow->clear();
                 sem2.release(WINDOW_SIZE+1);
             }
+
+
 
             break;
         case DATA_PACKET:
