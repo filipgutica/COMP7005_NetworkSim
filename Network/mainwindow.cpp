@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QTime>
 #include <windows.h>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -9,8 +10,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    QSettings settings(QString("../config.ini"), QSettings::IniFormat);
+    network_port = settings.value("settings/network_port", "7003").toInt();
+    bit_error_rate = settings.value("settings/bit_error_rate", 10).toInt();
+
     socket = new QUdpSocket(this);
-    socket->bind(QHostAddress::AnyIPv4, NETWORK_PORT);
+    socket->bind(QHostAddress::AnyIPv4, network_port);
     connect(socket, SIGNAL(readyRead()), this, SLOT(readDatagrams()));
 
     tx_socket = new QUdpSocket(this);
@@ -40,7 +45,7 @@ void MainWindow::readDatagrams()
     if (socket->hasPendingDatagrams())
     {
 
-        if (randomValue >= BIT_ERROR_RATE)
+        if (randomValue >= bit_error_rate)
         {
             socket->readDatagram((char*)&p, sizeof(p));
             ProcessPacket(p);

@@ -245,7 +245,7 @@ void MainWindow::ProcessPacket(packet p)
             AppendToLog("Retransmission: ");
             PrintPacketInfo(retransmitPackets->at(i));
             WriteUDP(retransmitPackets->at(i));
-            sem2.release();
+            //sem2.release();
         }
     }
  }

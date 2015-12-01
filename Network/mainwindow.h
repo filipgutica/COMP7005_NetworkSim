@@ -53,6 +53,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    int bit_error_rate;
+    int network_port;
 };
 
 #endif // MAINWINDOW_H
