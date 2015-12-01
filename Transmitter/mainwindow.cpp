@@ -112,21 +112,9 @@ void MainWindow::ProcessPacket(packet p)
     {
         case CONTROL_PACKET:
 
-            /*if(sentPacket.SeqNum  == p.AckNum)
-            {
-                sem1.acquire();
-                PrintPacketInfo(p);
-
-                timer->start();
-                reTransmitCount = 0;
-                sem2.release();
-            }*/
-
-          //  sem1.acquire();
-
             receivedControlPackets->push_back(p);
 
-            if (receivedControlPackets->size() >= WINDOW_SIZE || lastPacket)
+            if (receivedControlPackets->size() == WINDOW_SIZE || lastPacket)
             {
                 timer->start(TIMEOUT);
                // qDebug() << "Received all acks";
@@ -143,7 +131,6 @@ void MainWindow::ProcessPacket(packet p)
         case DATA_PACKET:
             packet dgram;
 
-
             if (!isDuplicatePacket(p))
             {
                 receivedDataPackets->push_back(p);
@@ -153,6 +140,9 @@ void MainWindow::ProcessPacket(packet p)
                 WriteUDP(dgram);
             }
             break;
+        case EOT_PACKET:
+            AppendToLog("EOT");
+            receivedDataPackets->clear();
         default:
             break;
     }
@@ -208,10 +198,6 @@ void MainWindow::ProcessPacket(packet p)
  {
     if (reTransmitCount < MAX_RETRANSMISSIONS && !lastPacket)
     {
-       /* AppendToLog(QString("Retransmitting!!!\n"));
-
-        WriteUDP(sentPacket);
-        sem2.release();*/
         reTransmitCount ++;
         for (int i = 0; i < currentPacketWindow->size(); i++)
         {
@@ -234,7 +220,6 @@ void MainWindow::ProcessPacket(packet p)
             PrintPacketInfo(retransmitPackets->at(i));
             WriteUDP(retransmitPackets->at(i));
         }
-
     }
  }
 
