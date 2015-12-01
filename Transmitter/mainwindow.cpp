@@ -150,7 +150,7 @@ void MainWindow::ProcessPacket(packet p)
                 receivedDataPackets->push_back(p);
 
                 PrintPacketInfo(p);
-                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, transmit_port, (char*)"ACK", (char*)transmit_addr.constData());
+                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, transmit_port, (char*)"ACK", transmit_addr.toUtf8().data());
                 WriteUDP(dgram);
             }
             break;
@@ -158,7 +158,7 @@ void MainWindow::ProcessPacket(packet p)
             packet eot_packet;
             AppendToLog("EOT");
             receivedDataPackets->clear();
-            BuildPacket(eot_packet, p.SeqNum, p.SeqNum, 0, EOT_ACK_PACKET, transmit_port, (char*)"ACK", (char*)transmit_addr.constData());
+            BuildPacket(eot_packet, p.SeqNum, p.SeqNum, 0, EOT_ACK_PACKET, transmit_port, (char*)"ACK", transmit_addr.toUtf8().data());
             WriteUDP(eot_packet);
             break;
         case EOT_ACK_PACKET:
