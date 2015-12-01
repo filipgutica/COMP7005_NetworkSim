@@ -118,13 +118,12 @@ void MainWindow::WriteUDP(packet p)
 
 void MainWindow::ProcessPacket(packet p)
 {
-
     switch (p.PacketType)
     {
         case CONTROL_PACKET:
             if(sentPacket.SeqNum == p.AckNum)
             {
-                sem1.acquire();
+              //  sem1.acquire();
                 PrintPacketInfo(p);
 
                 timer->start();
@@ -194,7 +193,7 @@ void MainWindow::ProcessPacket(packet p)
  {
     if (reTransmitCount < MAX_RETRANSMISSIONS && !lastPacket)
     {
-        AppendToLog(QString("Retransmitting!!!"));
+        AppendToLog(QString("Retransmitting!!!\n"));
         reTransmitCount ++;
         WriteUDP(sentPacket);
         sem2.release();

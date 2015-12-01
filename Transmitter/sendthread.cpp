@@ -45,7 +45,7 @@ void SendThread::run()
         if ((file.size() - i) <= DATA_SIZE)
             window->lastPacket = true;
 
-        sem1.release();
+       // sem1.release();
 
         i += DATA_SIZE;
         seqNum++;
