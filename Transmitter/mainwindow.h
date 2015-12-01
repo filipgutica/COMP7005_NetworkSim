@@ -7,6 +7,7 @@
 #define CONTROL_PACKET 001
 #define DATA_PACKET 002
 #define EOT_PACKET 003
+#define EOT_ACK_PACKET 004
 #define DATA_SIZE 256
 #define MAX_RETRANSMISSIONS 4
 #define WINDOW_SIZE 10
@@ -66,6 +67,7 @@ private slots:
     void readtxDatagrams();
     void on_listView_doubleClicked(const QModelIndex &index);
     void timeoutEvent();
+    void eot_ack_timeout();
 
 private:
     Ui::MainWindow *ui;
@@ -73,6 +75,7 @@ private:
     QUdpSocket *rx_socket;
     QStringList _fileList;
     QTimer *timer;
+    QTimer *EOTAckTimer;
     int previous_ack;
     QVector<packet> *receivedControlPackets;
     QVector<packet> *retransmitPackets;

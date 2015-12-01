@@ -31,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Timer for ack timeouts
     timer = new QTimer(this);
+    EOTAckTimer = new QTimer(this);
+    connect(EOTAckTimer, SIGNAL(timeout()), this, SLOT(eot_ack_timeout()));
     connect(timer, SIGNAL(timeout()),this, SLOT(timeoutEvent()));
 
     ListenThread *thrd = new ListenThread(this);
@@ -145,8 +147,19 @@ void MainWindow::ProcessPacket(packet p)
             }
             break;
         case EOT_PACKET:
+            packet eot_packet;
             AppendToLog("EOT");
             receivedDataPackets->clear();
+            BuildPacket(eot_packet, p.SeqNum, p.SeqNum, 0, EOT_ACK_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            WriteUDP(eot_packet);
+            break;
+        case EOT_ACK_PACKET:
+            AppendToLog("EOT-ACK");
+            currentPacketWindow->clear();
+            receivedControlPackets->clear();
+            reTransmitCount = 0;
+            lastPacket = false;
+            break;
         default:
             break;
     }
@@ -238,4 +251,14 @@ void MainWindow::ProcessPacket(packet p)
      }
 
      return false;
+ }
+
+ void MainWindow::eot_ack_timeout()
+ {
+    if (reTransmitCount < MAX_RETRANSMISSIONS)
+    {
+        reTransmitCount++;
+
+
+    }
  }
