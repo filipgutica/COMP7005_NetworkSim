@@ -55,6 +55,7 @@ public:
     void ProcessPacket(packet);
     void BuildPacket(packet &p, int ack, int seq, int win, int type, int destPort, char* data, char* destAddr);
     void PrintPacketInfo(packet p);
+    bool isDuplicatePacket(packet p);
     ~MainWindow();
 
 signals:
@@ -74,7 +75,8 @@ private:
     int previous_ack;
     QVector<packet> *receivedControlPackets;
     QVector<packet> *retransmitPackets;
-    int reTransmitCount;
+    QVector<packet> *receivedDataPackets;
+     int reTransmitCount;
 };
 
 #endif // MAINWINDOW_H

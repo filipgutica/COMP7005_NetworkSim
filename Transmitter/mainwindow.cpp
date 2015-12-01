@@ -22,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     currentPacketWindow = new QVector<packet>();
     receivedControlPackets = new QVector<packet>();
     retransmitPackets = new QVector<packet>();
+    receivedDataPackets = new QVector<packet>();
     lastPacket = false;
 
     tx_socket = new QUdpSocket(this);
@@ -141,9 +142,18 @@ void MainWindow::ProcessPacket(packet p)
             break;
         case DATA_PACKET:
             packet dgram;
-            PrintPacketInfo(p);
-            BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
-            WriteUDP(dgram);
+
+
+            if (!isDuplicatePacket(p))
+            {
+                receivedDataPackets->push_back(p);
+
+
+
+                PrintPacketInfo(p);
+                BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+                WriteUDP(dgram);
+            }
             break;
         default:
             break;
@@ -230,3 +240,15 @@ void MainWindow::ProcessPacket(packet p)
     }
  }
 
+ bool MainWindow::isDuplicatePacket(packet p)
+ {
+     for (int i = 0; i < receivedDataPackets->size(); i++)
+     {
+         if (p.SeqNum == receivedDataPackets->at(i).SeqNum)
+         {
+            return true;
+         }
+     }
+
+     return false;
+ }
