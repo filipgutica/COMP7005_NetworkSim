@@ -152,6 +152,11 @@ void MainWindow::ProcessPacket(packet p)
                 BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, transmit_port, (char*)"ACK", transmit_addr.toUtf8().data());
                 WriteUDP(dgram);
             }
+            else
+            {
+                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, transmit_port, (char*)"ACK", transmit_addr.toUtf8().data());
+                WriteUDP(dgram);
+            }
             break;
         case EOT_PACKET:
             packet eot_packet;
