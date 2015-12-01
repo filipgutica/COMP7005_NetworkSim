@@ -129,13 +129,12 @@ void MainWindow::ProcessPacket(packet p)
         case CONTROL_PACKET:
 
 
-            timer->start(timeout);
             receivedControlPackets->push_back(p);
-            qDebug() << receivedControlPackets->size();
+           // qDebug() << receivedControlPackets->size();
             PrintPacketInfo(p);
-            if (receivedControlPackets->size() >= window_size || lastPacket)
+            if (receivedControlPackets->size() == window_size || lastPacket)
             {
-
+                timer->start(timeout);
                 receivedControlPackets->clear();
                 currentPacketWindow->clear();
                 sem2.release(window_size+1);
