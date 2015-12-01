@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     allPacketsAckd = true;
     currentPacketWindow = new QVector<packet>();
     receivedControlPackets = new QVector<packet>();
+    retransmitPackets = new QVector<packet>();
     lastPacket = false;
 
     tx_socket = new QUdpSocket(this);
@@ -31,20 +32,8 @@ MainWindow::MainWindow(QWidget *parent) :
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()),this, SLOT(timeoutEvent()));
 
-
-#ifndef THREADED
-    qDebug() << "Not Threaded";
-    rx_socket = new QUdpSocket(this);
-    rx_socket->bind(QHostAddress::AnyIPv4, RECEIVER_PORT);
-    connect(rx_socket, SIGNAL(readyRead()), this, SLOT(readrxDatagrams()));
-
-#endif
-
-#ifdef THREADED
-    qDebug() << "Threaded";
     ListenThread *thrd = new ListenThread(this);
     thrd->start();
-#endif
 
     connect(this, SIGNAL(valueChanged(QString)), ui->log, SLOT(append(QString)));
 }
@@ -95,7 +84,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     sendThrd->start();
 
-    timer->start(200);
+    timer->start(500);
 
 }
 
@@ -103,7 +92,7 @@ void MainWindow::readtxDatagrams()
 {
     packet packet;
 
-    while (tx_socket->hasPendingDatagrams())
+    if (tx_socket->hasPendingDatagrams())
     {
         tx_socket->readDatagram((char*)&packet, sizeof(packet));
         ProcessPacket(packet);
@@ -121,14 +110,32 @@ void MainWindow::ProcessPacket(packet p)
     switch (p.PacketType)
     {
         case CONTROL_PACKET:
-            if(sentPacket.SeqNum == p.AckNum)
+
+            /*if(sentPacket.SeqNum  == p.AckNum)
             {
-              //  sem1.acquire();
+                sem1.acquire();
                 PrintPacketInfo(p);
 
                 timer->start();
                 reTransmitCount = 0;
                 sem2.release();
+            }*/
+
+          //  sem1.acquire();
+
+            receivedControlPackets->push_back(p);
+
+            if (receivedControlPackets->size() >= WINDOW_SIZE || lastPacket)
+            {
+                timer->start();
+               // qDebug() << "Received all acks";
+                for (int i = 0; i< receivedControlPackets->size(); i++)
+                {
+                    PrintPacketInfo(receivedControlPackets->at(i));
+                }
+                receivedControlPackets->clear();
+                currentPacketWindow->clear();
+                sem2.release(WINDOW_SIZE);
             }
 
             break;
@@ -193,10 +200,35 @@ void MainWindow::ProcessPacket(packet p)
  {
     if (reTransmitCount < MAX_RETRANSMISSIONS && !lastPacket)
     {
-        AppendToLog(QString("Retransmitting!!!\n"));
-        reTransmitCount ++;
+       /* AppendToLog(QString("Retransmitting!!!\n"));
+
         WriteUDP(sentPacket);
-        sem2.release();
+        sem2.release();*/
+        reTransmitCount ++;
+        for (int i = 0; i < currentPacketWindow->size(); i++)
+        {
+            for (int j = 0; j < receivedControlPackets->size(); j++)
+            {
+                //qDebug() << receivedControlPackets->at(j).AckNum << "  |  " << currentPacketWindow->at(i).SeqNum;
+                if (receivedControlPackets->at(j).AckNum == currentPacketWindow->at(i).SeqNum)
+                {
+                    currentPacketWindow->remove(i);
+
+                }
+            }
+        }
+
+        retransmitPackets = currentPacketWindow;
+
+        for (int i = 0; i < retransmitPackets->size(); i++)
+        {
+            AppendToLog("Retransmission: ");
+            PrintPacketInfo(retransmitPackets->at(i));
+            WriteUDP(retransmitPackets->at(i));
+            qDebug() << "retransmit: " << retransmitPackets->at(i).SeqNum;
+        }
+
+        retransmitPackets->clear();
     }
  }
 

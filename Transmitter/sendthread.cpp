@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 
-QSemaphore sem2(1);
+QSemaphore sem2(WINDOW_SIZE);
 
 SendThread::SendThread(QObject *parent)
 {
@@ -40,7 +40,18 @@ void SendThread::run()
 
         // Write the datagrams
         sem2.acquire();
-        window->WriteUDP(dgram);
+        window->currentPacketWindow->push_back(dgram);
+
+      //  window->WriteUDP(dgram);
+
+        if (window->currentPacketWindow->size() >= WINDOW_SIZE || (file.size() - i) <= DATA_SIZE)
+        {
+            for (int i = 0; i < window->currentPacketWindow->size(); i++)
+            {
+                window->WriteUDP(window->currentPacketWindow->at(i));
+            }
+
+        }
 
         if ((file.size() - i) <= DATA_SIZE)
             window->lastPacket = true;

@@ -8,8 +8,8 @@
 #define DATA_PACKET 002
 #define DATA_SIZE 256
 #define MAX_RETRANSMISSIONS 4
+#define WINDOW_SIZE 2
 
-#define THREADED
 
 
 #include <QMainWindow>
@@ -73,6 +73,7 @@ private:
     QTimer *timer;
     int previous_ack;
     QVector<packet> *receivedControlPackets;
+    QVector<packet> *retransmitPackets;
     int reTransmitCount;
 };
 
