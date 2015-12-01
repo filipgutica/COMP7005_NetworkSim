@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTime>
+#include <windows.h>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -98,5 +99,6 @@ void MainWindow::PrintPacketInfo(packet p)
 void MainWindow::WriteUDP(packet p)
 {
     // Redirect packet to the destination address and port in the received packet structure
+    Sleep(DELAY);
     tx_socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(p.dest_addr), p.dest_port);
 }

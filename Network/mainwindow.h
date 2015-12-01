@@ -8,7 +8,8 @@
 #define DATA_PACKET 002
 #define DATA_SIZE 256
 #define WINDOW_SIZE 10
-#define BIT_ERROR_RATE 10
+#define BIT_ERROR_RATE 20
+#define DELAY 0
 
 #include <QMainWindow>
 #include <QtNetwork>
