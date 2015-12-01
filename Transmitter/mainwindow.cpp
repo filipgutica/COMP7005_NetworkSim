@@ -148,10 +148,8 @@ void MainWindow::ProcessPacket(packet p)
             {
                 receivedDataPackets->push_back(p);
 
-
-
                 PrintPacketInfo(p);
-                BuildPacket(dgram, p.SeqNum + 1, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
                 WriteUDP(dgram);
             }
             break;
