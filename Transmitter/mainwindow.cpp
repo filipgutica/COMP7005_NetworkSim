@@ -84,7 +84,7 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     sendThrd->start();
 
-    timer->start(500);
+    timer->start(TIMEOUT);
 
 }
 
@@ -127,7 +127,7 @@ void MainWindow::ProcessPacket(packet p)
 
             if (receivedControlPackets->size() >= WINDOW_SIZE || lastPacket)
             {
-                timer->start();
+                timer->start(TIMEOUT);
                // qDebug() << "Received all acks";
                 for (int i = 0; i< receivedControlPackets->size(); i++)
                 {
@@ -135,7 +135,7 @@ void MainWindow::ProcessPacket(packet p)
                 }
                 receivedControlPackets->clear();
                 currentPacketWindow->clear();
-                sem2.release(WINDOW_SIZE);
+                sem2.release(WINDOW_SIZE+1);
             }
 
             break;
@@ -225,10 +225,8 @@ void MainWindow::ProcessPacket(packet p)
             AppendToLog("Retransmission: ");
             PrintPacketInfo(retransmitPackets->at(i));
             WriteUDP(retransmitPackets->at(i));
-            qDebug() << "retransmit: " << retransmitPackets->at(i).SeqNum;
         }
 
-        retransmitPackets->clear();
     }
  }
 

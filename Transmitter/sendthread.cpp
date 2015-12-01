@@ -3,7 +3,7 @@
 #include <Windows.h>
 
 
-QSemaphore sem2(WINDOW_SIZE);
+QSemaphore sem2(WINDOW_SIZE+1);
 
 SendThread::SendThread(QObject *parent)
 {

@@ -8,8 +8,8 @@
 #define DATA_PACKET 002
 #define DATA_SIZE 256
 #define MAX_RETRANSMISSIONS 4
-#define WINDOW_SIZE 2
-
+#define WINDOW_SIZE 10
+#define TIMEOUT 500
 
 
 #include <QMainWindow>
