@@ -12,13 +12,14 @@ class SendThread : public QThread
     Q_OBJECT
 public:
     SendThread(QObject *parent);
-    void setData(QString);
+    void setData(QString, QString);
     void run();
 
 private:
     QUdpSocket *tx_socket;
     QString fileToSend;
     MainWindow *window;
+    QString recv_addr;
 signals:
 
 public slots:

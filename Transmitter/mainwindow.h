@@ -10,13 +10,14 @@
 #define EOT_ACK_PACKET 004
 #define DATA_SIZE 256
 #define MAX_RETRANSMISSIONS 4
-#define WINDOW_SIZE 10
-#define TIMEOUT 1000
+#define WINDOW_SIZE 5
+#define TIMEOUT 500
 
 
 #include <QMainWindow>
 #include <QtNetwork>
 #include <QTimer>
+#include <QSettings>
 
 
 
@@ -49,6 +50,16 @@ public:
     packet sentPacket;
     bool lastPacket;
 
+    QString recv_addr;
+    QString network_addr;
+    QString transmit_addr;
+    int timeout;
+    int window_size;
+    int max_retransmissions;
+    int network_port;
+    int receiver_port;
+    int transmit_port;
+
     explicit MainWindow(QWidget *parent = 0);
     void loadFiles();
     void updateFileList();
@@ -80,7 +91,7 @@ private:
     QVector<packet> *receivedControlPackets;
     QVector<packet> *retransmitPackets;
     QVector<packet> *receivedDataPackets;
-     int reTransmitCount;
+    int reTransmitCount;
 };
 
 #endif // MAINWINDOW_H

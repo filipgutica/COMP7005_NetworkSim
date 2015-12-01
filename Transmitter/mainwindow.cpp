@@ -7,6 +7,7 @@
 
 QMutex mutex;
 QSemaphore sem1;
+QSemaphore sem2;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,6 +18,19 @@ MainWindow::MainWindow(QWidget *parent) :
     loadFiles();
     updateFileList();
 
+    QSettings settings(QString("../config.ini"), QSettings::IniFormat);
+    recv_addr = settings.value("settings/receiver_address", "127.0.0.1").toString();
+    network_addr = settings.value("settings/network_address", "127.0.0.1").toString();
+    transmit_addr = settings.value("settings/transmit_address", "127.0.0.1").toString();
+    timeout = settings.value("settings/timeout", "500").toInt();
+    window_size = settings.value("settings/window_size", "5").toInt();
+    max_retransmissions = settings.value("settings/max_retransmissions", "4").toInt();
+    network_port = settings.value("settings/network_port", "7003").toInt();
+    receiver_port = settings.value("settings/receiver_port", "7001").toInt();
+    transmit_port = settings.value("settings/transmit_port", "7002").toInt();
+
+    sem2.release(window_size+1);
+
     reTransmitCount = 0;
     allPacketsAckd = true;
     currentPacketWindow = new QVector<packet>();
@@ -26,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lastPacket = false;
 
     tx_socket = new QUdpSocket(this);
-    tx_socket->bind(QHostAddress::AnyIPv4, TRANSMIT_PORT);
+    tx_socket->bind(QHostAddress::AnyIPv4, transmit_port);
     connect(tx_socket, SIGNAL(readyRead()), this, SLOT(readtxDatagrams()));
 
     // Timer for ack timeouts
@@ -83,11 +97,11 @@ void MainWindow::on_listView_doubleClicked(const QModelIndex &index)
 
     lastPacket = false;
 
-    sendThrd->setData(index.data().toString());
+    sendThrd->setData(index.data().toString(), recv_addr);
 
     sendThrd->start();
 
-    timer->start(TIMEOUT);
+    timer->start(timeout);
 
 }
 
@@ -104,7 +118,7 @@ void MainWindow::readtxDatagrams()
 
 void MainWindow::WriteUDP(packet p)
 {
-    tx_socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(NETWORK_ADDR), NETWORK_PORT);
+    tx_socket->writeDatagram( (char*)&p, sizeof(p), QHostAddress(network_addr), network_port);
 }
 
 
@@ -115,23 +129,17 @@ void MainWindow::ProcessPacket(packet p)
         case CONTROL_PACKET:
 
 
+            timer->start(timeout);
             receivedControlPackets->push_back(p);
             qDebug() << receivedControlPackets->size();
-            if (receivedControlPackets->size() >= WINDOW_SIZE || lastPacket)
+            PrintPacketInfo(p);
+            if (receivedControlPackets->size() >= window_size || lastPacket)
             {
-                timer->start(TIMEOUT);
-               // qDebug() << "Received all acks";
-                for (int i = 0; i< receivedControlPackets->size(); i++)
-                {
-                    PrintPacketInfo(receivedControlPackets->at(i));
-                }
 
                 receivedControlPackets->clear();
                 currentPacketWindow->clear();
-                sem2.release(WINDOW_SIZE+1);
+                sem2.release(window_size+1);
             }
-
-
 
             break;
         case DATA_PACKET:
@@ -142,7 +150,7 @@ void MainWindow::ProcessPacket(packet p)
                 receivedDataPackets->push_back(p);
 
                 PrintPacketInfo(p);
-                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+                BuildPacket(dgram, p.SeqNum, p.SeqNum, 0, CONTROL_PACKET, transmit_port, (char*)"ACK", (char*)transmit_addr.constData());
                 WriteUDP(dgram);
             }
             break;
@@ -150,7 +158,7 @@ void MainWindow::ProcessPacket(packet p)
             packet eot_packet;
             AppendToLog("EOT");
             receivedDataPackets->clear();
-            BuildPacket(eot_packet, p.SeqNum, p.SeqNum, 0, EOT_ACK_PACKET, TRANSMIT_PORT, (char*)"ACK", (char*)TRANSMIT_ADDR);
+            BuildPacket(eot_packet, p.SeqNum, p.SeqNum, 0, EOT_ACK_PACKET, transmit_port, (char*)"ACK", (char*)transmit_addr.constData());
             WriteUDP(eot_packet);
             break;
         case EOT_ACK_PACKET:
@@ -159,6 +167,7 @@ void MainWindow::ProcessPacket(packet p)
             receivedControlPackets->clear();
             reTransmitCount = 0;
             lastPacket = false;
+            sem2.release(window_size+1);
             break;
         default:
             break;
@@ -213,7 +222,7 @@ void MainWindow::ProcessPacket(packet p)
 
  void MainWindow::timeoutEvent()
  {
-    if (reTransmitCount < MAX_RETRANSMISSIONS && !lastPacket)
+    if (reTransmitCount < max_retransmissions && !lastPacket)
     {
         reTransmitCount ++;
         for (int i = 0; i < currentPacketWindow->size(); i++)
@@ -236,6 +245,7 @@ void MainWindow::ProcessPacket(packet p)
             AppendToLog("Retransmission: ");
             PrintPacketInfo(retransmitPackets->at(i));
             WriteUDP(retransmitPackets->at(i));
+            sem2.release();
         }
     }
  }
@@ -255,10 +265,9 @@ void MainWindow::ProcessPacket(packet p)
 
  void MainWindow::eot_ack_timeout()
  {
-    if (reTransmitCount < MAX_RETRANSMISSIONS)
+    if (reTransmitCount < max_retransmissions)
     {
         reTransmitCount++;
-
 
     }
  }
