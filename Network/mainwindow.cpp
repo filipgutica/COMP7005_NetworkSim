@@ -39,7 +39,7 @@ void MainWindow::readDatagrams()
     if (socket->hasPendingDatagrams())
     {
 
-        if (randomValue > 20)
+        if (randomValue >= BIT_ERROR_RATE)
         {
             socket->readDatagram((char*)&p, sizeof(p));
             ProcessPacket(p);
@@ -47,7 +47,8 @@ void MainWindow::readDatagrams()
         else
         {
             socket->readDatagram((char*)&p, sizeof(p));
-            AppendToLog("Dropped a packet!\n");
+            AppendToLog("Dropping packet: ");
+            PrintPacketInfo(p);
 
         }
     }
